@@ -9,7 +9,7 @@ import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
 import notificationRoutes from "./routes/notification.route.js";
 import connectionRoutes from "./routes/connection.route.js";
-import { errorHandler } from './middleware/errorHandler.js';
+import { errorHandler } from "./middleware/errorHandler.js";
 import { server, app, io } from "./lib/socket.js"; // Import app and server from socket.js
 import messageRoute from "./routes/messages.route.js";
 
@@ -19,13 +19,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+app.use(cors());
 
 app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
@@ -58,7 +52,7 @@ app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 app.get("/", (req, res) => {
   res.send("API is running...");
-})
+});
 
 // Start the server
 server.listen(PORT, () => {
