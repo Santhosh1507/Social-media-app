@@ -22,7 +22,7 @@ const __dirname = path.resolve();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5000",
+    origin: "https://social-media-app-oi1b.onrender.com",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
