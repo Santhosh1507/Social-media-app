@@ -95,14 +95,13 @@ export const logout = (req, res) => {
 };
 
 export const getCurrentUser = async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id).select('-password'); // Exclude password
-        res.json(user); // Send user info including gender
-    } catch (error) {
-        console.error("Error in getCurrentUser controller:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-};
+	try {
+		res.json(req.user);
+	} catch (error) {
+		console.error("Error in getCurrentUser controller:", error);
+		res.status(500).json({ message: "Server error" });
+	}
+}
 
 
 export const deleteUserAndContent = async (req, res) => {
