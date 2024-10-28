@@ -8,9 +8,8 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://social-media-app-one-jade.vercel.app"],
+    origin: ["https://social-media-app-one-jade.vercel.app/"],
     methods: ["GET", "POST"],
-    credentials: true,
   },
 });
 

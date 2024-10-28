@@ -79,6 +79,7 @@ export const login = async (req, res) => {
             httpOnly: true,
             maxAge: 3 * 24 * 60 * 60 * 1000,
             sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
         });
 
         res.json({ message: "Logged in successfully", user: { name: user.name, username: user.username, email: user.email, gender: user.gender } }); // Return user info
@@ -95,13 +96,14 @@ export const logout = (req, res) => {
 };
 
 export const getCurrentUser = async (req, res) => {
-	try {
-		res.json(req.user);
-	} catch (error) {
-		console.error("Error in getCurrentUser controller:", error);
-		res.status(500).json({ message: "Server error" });
-	}
-}
+    try {
+        const user = await User.findById(req.user._id).select('-password'); // Exclude password
+        res.json(user); // Send user info including gender
+    } catch (error) {
+        console.error("Error in getCurrentUser controller:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
 
 export const deleteUserAndContent = async (req, res) => {

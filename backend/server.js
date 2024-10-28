@@ -9,7 +9,7 @@ import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
 import notificationRoutes from "./routes/notification.route.js";
 import connectionRoutes from "./routes/connection.route.js";
-import { errorHandler } from "./middleware/errorHandler.js";
+import { errorHandler } from './middleware/errorHandler.js';
 import { server, app, io } from "./lib/socket.js"; // Import app and server from socket.js
 import messageRoute from "./routes/messages.route.js";
 
@@ -19,7 +19,14 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
-app.use(cors());
+// Middleware
+app.use(
+  cors({
+    origin: "https://social-media-app-one-jade.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
@@ -41,7 +48,7 @@ app.use("/api/v1/messages", messageRoute);
 
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
-// // Serve frontend in production
+// Serve frontend in production
 // if (process.env.NODE_ENV === "production") {
 //   app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
@@ -52,7 +59,7 @@ app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 app.get("/", (req, res) => {
   res.send("API is running...");
-});
+})
 
 // Start the server
 server.listen(PORT, () => {
