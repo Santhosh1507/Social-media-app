@@ -8,7 +8,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://social-media-app-oi1b.onrender.com/"],
+    origin: ["http://localhost:5000/"],
     methods: ["GET", "POST"],
   },
 });
