@@ -34,24 +34,6 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			default: "",
 		},
-		skills: [String],
-		experience: [
-			{
-				title: String,
-				company: String,
-				startDate: Date,
-				endDate: Date,
-				description: String,
-			},
-		],
-		education: [
-			{
-				school: String,
-				fieldOfStudy: String,
-				startYear: Number,
-				endYear: Number,
-			},
-		],
 		connections: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
