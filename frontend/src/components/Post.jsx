@@ -19,6 +19,7 @@ const Post = ({ post }) => {
   const [popupImage, setPopupImage] = useState('');
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
 
   const isOwner = authUser?._id === post.author._id;
   const isLiked = post.likes.includes(authUser?._id);
@@ -27,31 +28,39 @@ const Post = ({ post }) => {
     setIsConfirmDeleteOpen(true);
   };
 
-  const confirmDeletePost = () => {
-    dispatch(deletePostAction(post._id))
-      .then(() => {
-        toast.success('Post deleted successfully');
-        window.location.reload(); // Reload the page after successful deletion
-      })
-      .catch((error) => {
-        toast.error(error.message || 'Failed to delete post');
-      });
-    
-    setIsConfirmDeleteOpen(false);
-  };
-
   const cancelDeletePost = () => {
     setIsConfirmDeleteOpen(false);
   };
 
+  const confirmDeletePost = () => {
+    setLoading(true); // Set loading state
+    dispatch(deletePostAction(post._id))
+      .then(() => {
+        toast.success('Post deleted successfully');
+        // Consider dispatching an action to remove the post from the state
+      })
+      .catch((error) => {
+        console.error('Delete post error:', error);
+        toast.error(error.message || 'Failed to delete post');
+      })
+      .finally(() => {
+        setLoading(false); // Reset loading state
+        setIsConfirmDeleteOpen(false);
+      });
+  };
+
   const handleLikePost = () => {
+    setLoading(true); // Set loading state
     dispatch(likePostAction(post._id))
       .then(() => {
         toast.success('Post liked successfully');
-        window.location.reload(); // Reload the page after successful like
+        // Update local state for optimistic UI
       })
       .catch((error) => {
         toast.error(error.message || 'Failed to like post');
+      })
+      .finally(() => {
+        setLoading(false); // Reset loading state
       });
   };
 
@@ -74,7 +83,6 @@ const Post = ({ post }) => {
             },
           ]);
           toast.success('Comment added successfully');
-           // Reload the page after adding the comment
         })
         .catch((error) => {
           toast.error(error.message || 'Failed to add comment');
@@ -211,17 +219,16 @@ const Post = ({ post }) => {
       )}
 
       {isConfirmDeleteOpen && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
-          <div className='bg-white p-6 rounded shadow-lg'>
-            <p className='text-lg font-semibold mb-4'>Are you sure you want to delete this post?</p>
-            <div className='flex justify-end gap-4'>
-              <button onClick={cancelDeletePost} className='px-4 py-2 bg-gray-300 rounded'>
-                Cancel
-              </button>
-              <button onClick={confirmDeletePost} className='px-4 py-2 bg-red-500 text-white rounded'>
-                Delete
-              </button>
-            </div>
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+          <div className='bg-white p-6 rounded-lg text-center'>
+            <h3 className='mb-4'>Are you sure you want to delete this post?</h3>
+            <button onClick={confirmDeletePost} className='bg-red-500 text-white px-4 py-2 mr-2 rounded'>
+              Yes, Delete
+            </button>
+            <button onClick={cancelDeletePost} className='bg-gray-300 px-4 py-2 rounded'>
+              Cancel
+            </button>
+            {loading && <Loader size={24} className="mt-2" />}
           </div>
         </div>
       )}

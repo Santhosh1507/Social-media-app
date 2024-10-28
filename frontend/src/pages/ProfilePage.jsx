@@ -27,7 +27,7 @@ const ProfilePage = () => {
                 console.error("Error fetching user data:", error);
             }
         };
-        
+
         fetchData();
     }, [dispatch, username]);
 
@@ -57,7 +57,7 @@ const ProfilePage = () => {
 
     if (isUserProfileLoading) return <div>Loading user profile...</div>;
     if (userProfileError) return <div>Error loading profile: {userProfileError}</div>;
-    if (!userProfile) return <div>User profile not found.</div>; 
+    if (!userProfile) return <div>User profile not found.</div>;
 
     const isOwnProfile = authUser.username === userProfile.username;
     const userData = isOwnProfile ? authUser : userProfile;
@@ -67,17 +67,9 @@ const ProfilePage = () => {
             <ProfileHeader userData={userData} isOwnProfile={isOwnProfile} onSave={handleSave} />
             <AboutSection userData={userData} isOwnProfile={isOwnProfile} onSave={handleSave} />
 
-            {isOwnProfile && (
-                <div className='mt-6'>
-                    <button className='w-full bg-red-500 text-white py-2 px-4 rounded-full hover:bg-red-600 transition duration-300' onClick={() => setShowDeleteModal(true)}>
-                        Delete Account
-                    </button>
-                </div>
-            )}
+            
 
-            {showDeleteModal && (
-                <DeleteAccountModal onConfirm={handleDeleteAccount} onCancel={() => setShowDeleteModal(false)} />
-            )}
+            
         </div>
     );
 };
