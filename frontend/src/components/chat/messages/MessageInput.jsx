@@ -1,26 +1,19 @@
 import React, { useState } from "react";
 import { BsSend } from "react-icons/bs";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 import useSendMessage from "../../chat/hooks/useSendMessage";
+import useConversation from "../zustand/useConversation"; // Import the useConversation hook
 
 const MessageInput = () => {
     const [message, setMessage] = useState("");
-    const { loading, sendMessage } = useSendMessage();
-    const navigate = useNavigate(); // Initialize the navigate function
+    const { loading, sendMessageAction } = useSendMessage();
+    const { selectedConversation } = useConversation(); // Get the selected conversation from the store
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent form from refreshing
-        if (!message) return;
-
-        try {
-            // Ensure async call is awaited
-            await sendMessage(message);
-            setMessage(""); // Clear input on success
-            navigate('/chat'); // Navigate to the chat page after sending a message
-        } catch (error) {
-            console.error("Error sending message:", error); // Handle errors properly
-        }
-       
+        e.preventDefault();
+        if (!message || !selectedConversation) return; // Ensure there's a message and selected conversation
+        const conversationId = selectedConversation._id; // Replace with the actual ID key if different
+        await sendMessageAction(conversationId, message);
+        setMessage("");
     };
 
     return (

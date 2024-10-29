@@ -19,13 +19,14 @@ const Conversation = ({ conversation, lastIndex }) => {
       >
         <div className={`avatar ${isOnline ? "online" : ""}`}>
           <div className="w-12 rounded-full">
-            <img src={conversation.profilePicture} alt={`${conversation.username}'s profile`} />
+            <img src={conversation.profilePicture || userAvatar} alt={`${conversation.username}'s profile`} />
           </div>
         </div>
 
         <div className="flex flex-col flex-1">
           <div className="flex gap-3 justify-between">
-            <p className="font-bold text-slate-700">{conversation.username}</p>
+            <p className="font-bold text-slate-700">{conversation.name}</p>
+            
           </div>
         </div>
       </div>

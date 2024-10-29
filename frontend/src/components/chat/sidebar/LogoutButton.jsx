@@ -3,8 +3,11 @@ import { BiLogOut } from "react-icons/bi";
 import useLogout from "../../chat/hooks/useSendMessage";
 import { useNavigate } from "react-router-dom";
 
+
 const LogoutButton = () => {
   const { loading, logout } = useLogout();
+  // const navigate = useNavigate();
+
   const navigate = useNavigate();
 
   const handleLogout = async () => {

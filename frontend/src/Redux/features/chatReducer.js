@@ -1,50 +1,101 @@
 // chatReducer.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { axiosInstance } from '../../lib/axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { axiosInstance } from "../../lib/axios";
+import toast from "react-hot-toast";
 
-// Async thunk to get messages
-export const getMessages = createAsyncThunk(
-    'chat/fetchMessages',
-    async (userId) => {
-        const response = await axiosInstance.get(`/api/messages/${userId}`);
-        return response.data; // returns the list of messages
+export const fetchConversations = createAsyncThunk(
+  "conversations/fetchConversations",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get("/users");
+      return data;
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error || "Failed to fetch conversations"
+      );
+      return rejectWithValue(error.response?.data);
     }
+  }
 );
 
-// Async thunk to send a message
+export const fetchMessages = createAsyncThunk(
+  "messages/fetchMessages",
+  async (conversationId, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get(`/messages/${conversationId}`);
+      return data;
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Failed to load messages");
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 export const sendMessage = createAsyncThunk(
-    'chat/sendMessage',
-    async ({ receiverId, messageContent }) => {
-        const response = await axiosInstance.post(`/api/messages/send/${receiverId}`, { message: messageContent });
-        return response.data.message; // returns the new message
+  "messages/sendMessages",
+  async ({ conversationId, message }, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.post(
+        `/messages/send/${conversationId}`,
+        { message }
+      );
+      return data; // Assuming the response contains the new message
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Failed to send message");
+      return rejectWithValue(error.response?.data);
     }
+  }
 );
+// Async thunk to send a message
 
 // Create a slice for chat
 const chatSlice = createSlice({
-    name: 'chat',
-    initialState: {
-        messages: [],
-        currentConversation: null,
+  name: "chat",
+  initialState: {
+    loading: false,
+    conversations: [],
+    messages: [],
+    selectedConversation: null,
+    error: null,
+  },
+  reducers: {
+    addMessage: (state, action) => {
+      state.messages.push(action.payload);
     },
-    reducers: {
-        setCurrentConversation: (state, action) => {
-            state.currentConversation = action.payload; // set current conversation
-        },
+    setMessages: (state, action) => {
+      state.messages = action.payload;
     },
-    extraReducers: (builder) => {
-        builder
-            .addCase(getMessages.fulfilled, (state, action) => {
-                state.messages = action.payload; // update messages on fetch
-            })
-            .addCase(sendMessage.fulfilled, (state, action) => {
-                state.messages.push(action.payload); // add new message to messages
-            });
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchConversations.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchConversations.fulfilled, (state, action) => {
+        state.loading = false;
+        state.conversations = action.payload;
+      })
+      .addCase(fetchConversations.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(fetchMessages.pending, (state) => {
+        state.loading = true; // Set loading to true while fetching
+        state.error = null; // Clear any previous errors
+      })
+      .addCase(fetchMessages.fulfilled, (state, action) => {
+        state.loading = false; // Set loading to false when fetching is done
+        state.messages = action.payload; // Store fetched messages
+      })
+      .addCase(fetchMessages.rejected, (state, action) => {
+        state.loading = false; // Set loading to false on error
+        state.error = action.payload; // Optionally store the error message
+      })
+      .addCase(sendMessage.fulfilled, (state, action) => {
+        state.messages.push(action.payload);
+      });
+  },
 });
 
-// Export actions
-export const { setCurrentConversation } = chatSlice.actions;
-
+export const { addMessage, setMessages } = chatSlice.actions;
 // Export the reducer
 export default chatSlice.reducer;

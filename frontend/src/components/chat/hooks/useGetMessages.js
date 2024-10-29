@@ -1,32 +1,43 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useConversation from "../zustand/useConversation";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../../../lib/axios"; // Assuming this is your axios instance
+import { axiosInstance } from "../../../lib/axios"; 
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMessages } from '../../../Redux/features/chatReducer';// Assuming this is your axios instance
 
 const useGetMessages = () => {
-  const [loading, setLoading] = useState(false);
-  const { messages, setMessages, selectedConversation } = useConversation();
+//   const [loading, setLoading] = useState(false);
+//   const { messages, setMessages, selectedConversation } = useConversation();
+const dispatch = useDispatch();
+  const { selectedConversation } = useConversation();
+  const { loading, messages } = useSelector((state) => state.chat);
 
-  useEffect(() => {
-      const getMessages = async () => {
-          setLoading(true);
-          try {
-              const res = await axiosInstance.get(`/messages/${selectedConversation._id}`);
-              const data = res.data;
+//   useEffect(() => {
+//       const getMessages = async () => {
+//           setLoading(true);
+//           try {
+//               const res = await axiosInstance.get(`/messages/${selectedConversation._id}`);
+//               const data = res.data;
               
-              // Ensure messages is always an array, fallback to empty array if not
-              setMessages(Array.isArray(data) ? data : []);
-          } catch (error) {
-              toast.error(error.response?.data?.error || "Failed to load messages.");
-          } finally {
-              setLoading(false);
-          }
-      };
+//               // Ensure messages is always an array, fallback to empty array if not
+//               setMessages(data);
+//           } catch (error) {
+//               toast.error(error.response?.data?.error || "Failed to load messages.");
+//           } finally {
+//               setLoading(false);
+//           }
+//       };
 
-      if (selectedConversation?._id) {
-          getMessages();
-      }
-  }, [selectedConversation?._id, setMessages]);
+//       if (selectedConversation?._id) {
+//           getMessages();
+//       }
+//   }, [selectedConversation?._id, setMessages]);
+
+useEffect(() => {
+    if (selectedConversation?._id) {
+      dispatch(fetchMessages(selectedConversation._id));
+    }
+  }, []);
 
   return { messages, loading };
 };
