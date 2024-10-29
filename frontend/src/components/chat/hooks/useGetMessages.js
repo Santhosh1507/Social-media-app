@@ -37,7 +37,7 @@ useEffect(() => {
     if (selectedConversation?._id) {
       dispatch(fetchMessages(selectedConversation._id));
     }
-  }, []);
+  }, [selectedConversation?._id, dispatch]);
 
   return { messages, loading };
 };
